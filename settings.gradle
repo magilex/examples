@@ -1,0 +1,27 @@
+rootProject.name='examples'
+Closure discoverSubprojects = {
+    def list = []
+    rootDir.eachDir() { d ->
+        if(d.name.equals("modules")){
+            d.eachDir() { dm ->
+                dm.eachFileMatch({ it == dm.name+'.gradle' }, {list += [dm.name]})
+            }
+        }
+    }
+    list.toArray(new java.lang.String[0])
+}
+def modules = discoverSubprojects()
+
+Closure setProjectFolders = {
+	modules.each { m ->
+		if(!m.equals("examples")){
+		project(":"+m).projectDir = file("modules/"+m)
+        	project(":"+m).buildFileName = m+".gradle"
+		}
+	}
+}
+
+print "xxxxxxxxxxxx $modules"
+
+include modules
+setProjectFolders()
