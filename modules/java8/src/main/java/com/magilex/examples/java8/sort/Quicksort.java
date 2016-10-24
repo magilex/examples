@@ -1,14 +1,9 @@
 package com.magilex.examples.java8.sort;
 
 
-import org.apache.commons.lang3.StringUtils;
+import com.magilex.examples.java8.ClTextTranslator;
 
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.IntFunction;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.lang.System.out;
@@ -20,6 +15,11 @@ import static org.apache.commons.lang3.StringUtils.rightPad;
  */
 public class Quicksort {
 
+    static int padding = 5;
+    static int sleepTime = 900;
+
+    ClTextTranslator clTextTranslator = new ClTextTranslator(sleepTime, padding);
+
     public static void main(String[] args) {
         out.println("Tony Hoare's 1959 quicksort algorithm");
 
@@ -29,7 +29,7 @@ public class Quicksort {
         Integer[] sorted = new Quicksort().init(unsorted);
 
         out.println("Final result:");
-        out.println(sorted);
+        print(sorted);
     }
 
     public Integer[] init(Integer[] unsorted) {
@@ -37,6 +37,7 @@ public class Quicksort {
     }
 
     private Integer[] partition(Integer [] unsorted) {
+        out.println("Partitioning...");
         int lastIndex = unsorted.length - 1;
         int lastElement = lastIndex;
 
@@ -45,10 +46,17 @@ public class Quicksort {
         int currentPosition = 0;
         for (int i = 0; i < pivotPosition; i++) {
             currentPosition = i;
+            out.println("\r");
             print(unsorted, pivotPosition, currentPosition);
+
             if (unsorted[i] > pivot) {
                 int nextToPivotPos = pivotPosition - 1;
                 int nextToPivot = unsorted[nextToPivotPos];
+                clTextTranslator.translateLeft(String.valueOf(pivot), pivotPosition, 1);
+                out.println("\r");
+                clTextTranslator.translateLeft(String.valueOf(unsorted[lastElement - 1]), pivotPosition - 1, pivotPosition - i - 1);
+                out.println("\r");
+                clTextTranslator.translateRight(String.valueOf(unsorted[i]), i, pivotPosition - i);
                 swap(unsorted[i], i, nextToPivot, pivotPosition, unsorted);
                 unsorted[nextToPivotPos] = pivot;
                 pivotPosition = nextToPivotPos;
@@ -56,9 +64,10 @@ public class Quicksort {
                 currentPosition = i + 1;
             }
 
-            Helper.sleep(700);
+            Helper.sleep(sleepTime);
         }
 
+        out.println("");
         print(unsorted, pivotPosition, currentPosition);
 
         Integer[] left = new Integer[pivotPosition]; // pivot is left out
@@ -96,7 +105,7 @@ public class Quicksort {
         unsorted[idxX] = y;
         unsorted[idxY] = x;
     }
-/*
+
     private static void print(Integer[] array, Integer pivotPosition, Integer ongoingIndex) {
         out.println (
                 IntStream.range(0, array.length)
@@ -104,30 +113,30 @@ public class Quicksort {
                     String val = array[i].toString() ;
                     val = i == pivotPosition ? "*" + val : val;
                     val = i == ongoingIndex ? "_" + val : val;
-                    return rightPad(val, 5);
-                }).collect(joining(" "))
+                    return rightPad(val, padding, ".");
+                }).collect(joining(""))
         );
 
-        //Arrays.stream(array).map()
     }
-*/
 
-    private static void print(Integer[] array, Integer pivotPosition, Integer ongoingIndex) {
+    private static void print(Integer[] array) {
         out.println (
                 IntStream.range(0, array.length)
-                        .mapToObj(f)
-                        .collect(joining(" "))
+                        .mapToObj(i -> {
+                            String val = array[i].toString() ;
+                            return rightPad(val, padding, ".");
+                        }).collect(joining(""))
         );
 
     }
 
-    static IntFunction<String> f = element -> rightPad(String.valueOf(element), 5);
+    static IntFunction<String> f = element -> rightPad(String.valueOf(element), padding);
 
     static QuadFunction<Integer[], Integer, Integer, Integer, String> f2 = (array, i, pivotPosition, ongoingIndex) -> {
         String val = array[i].toString() ;
         val = i == pivotPosition ? "*" + val : val;
         val = i == ongoingIndex ? "_" + val : val;
-        return rightPad(val, 5);
+        return rightPad(val, padding);
     };
 
     interface QuadFunction<T, U, V, W, R> {
