@@ -12,8 +12,6 @@ import static org.apache.commons.lang3.StringUtils.leftPad;
  */
 public class ClTextTranslator {
 
-    private static char PAD_CHAR = '.';
-
     private int tick;
     private int padding;
 
@@ -51,7 +49,7 @@ public class ClTextTranslator {
                 .map(i -> map.apply(i).applyAsInt(startRange, endRange))
                 .forEach(i -> {
                     if (i != initPos) out.print("\r");
-                    out.print(leftPad(string, (i * padding) + string.length(), PAD_CHAR));
+                    out.print(leftPad(string, (i * padding) + string.length(), Constants.PAD_CHAR));
                     sleep(tick);
                 });
     }

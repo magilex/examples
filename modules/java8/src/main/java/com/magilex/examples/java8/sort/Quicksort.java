@@ -1,88 +1,99 @@
 package com.magilex.examples.java8.sort;
 
-
-import com.magilex.examples.java8.ClTextTranslator;
-
-import java.util.function.IntFunction;
-import java.util.stream.IntStream;
-
+import static com.magilex.examples.java8.Constants.padding;
+import static com.magilex.examples.java8.Constants.sleepTime;
 import static java.lang.System.out;
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.rightPad;
 
 /**
  * Created by marcocamacho on 9/29/16.
  */
 public class Quicksort {
 
-    static int padding = 5;
-    static int sleepTime = 900;
-
-    ClTextTranslator clTextTranslator = new ClTextTranslator(sleepTime, padding);
+    static ConsoleDisplay display = ConsoleDisplay.newInstance(padding, sleepTime);
 
     public static void main(String[] args) {
         out.println("Tony Hoare's 1959 quicksort algorithm");
 
         Integer[] unsorted = new Integer[] {4,6,1,9,10,3,30,5};
 
-        //print(new Quicksort().init(unsorted), unsorted.length);
-        Integer[] sorted = new Quicksort().init(unsorted);
+        Quicksort quicksort = new Quicksort();
+        quicksort.masterListener = QuicksortListener.QuicksortListenerFactory.create(new QuicksortConsoleDisplayListener());
 
-        out.println("Final result:");
-        print(sorted);
+        quicksort.init(unsorted);
     }
+
+    QuicksortListener masterListener;
 
     public Integer[] init(Integer[] unsorted) {
         return partition(unsorted);
     }
 
-    private Integer[] partition(Integer [] unsorted) {
-        out.println("Partitioning...");
-        int lastIndex = unsorted.length - 1;
-        int lastElement = lastIndex;
+    public static class PartitionIterationInfo {
 
-        int pivot = unsorted[lastElement];
-        int pivotPosition = lastElement;
-        int currentPosition = 0;
-        for (int i = 0; i < pivotPosition; i++) {
-            currentPosition = i;
-            out.println("\r");
-            print(unsorted, pivotPosition, currentPosition);
+        Integer [] ongoing;
+        int pivotIdx, ongoingIdx, ongoingVal, pivotVal;
 
-            if (unsorted[i] > pivot) {
-                int nextToPivotPos = pivotPosition - 1;
-                int nextToPivot = unsorted[nextToPivotPos];
-                clTextTranslator.translateLeft(String.valueOf(pivot), pivotPosition, 1);
-                out.println("\r");
-                clTextTranslator.translateLeft(String.valueOf(unsorted[lastElement - 1]), pivotPosition - 1, pivotPosition - i - 1);
-                out.println("\r");
-                clTextTranslator.translateRight(String.valueOf(unsorted[i]), i, pivotPosition - i);
-                swap(unsorted[i], i, nextToPivot, pivotPosition, unsorted);
-                unsorted[nextToPivotPos] = pivot;
-                pivotPosition = nextToPivotPos;
-                i--;
-                currentPosition = i + 1;
+        public PartitionIterationInfo(Integer[] ongoing, int pivotIdx, int pivotVal) {
+            this.ongoing = ongoing;
+            this.pivotIdx = pivotIdx;
+            this.pivotVal = pivotVal;
+        }
+    }
+
+    private Integer[] partition(Integer [] ongoing) {
+
+        masterListener.notifyPartitionStarted();
+
+        int lastIdx = ongoing.length - 1;
+        int pivotVal = ongoing[lastIdx]; // Rightmost element
+
+        PartitionIterationInfo iterationInfo = new PartitionIterationInfo(ongoing, lastIdx, pivotVal);
+
+        for (int i = 0; i < iterationInfo.pivotIdx; i++) {
+
+            iterationInfo.ongoingIdx = i;
+            iterationInfo.ongoingVal = ongoing[i];
+
+            boolean ongoingVal_GreaterThan_PivotVal = iterationInfo.ongoingVal > pivotVal;
+
+            masterListener.notifyCycleStarted(iterationInfo, ongoingVal_GreaterThan_PivotVal);
+
+            if (ongoingVal_GreaterThan_PivotVal) {
+
+                masterListener.notifySwapNeeded(iterationInfo, i);
+
+                int nextToPivotIdx = iterationInfo.pivotIdx - 1;
+                int nextToPivot = ongoing[nextToPivotIdx];
+                if (iterationInfo.ongoingIdx == nextToPivotIdx) {
+                    swap(iterationInfo);
+                } else {
+                    swap(iterationInfo, nextToPivot, nextToPivotIdx);
+                }
+
+                iterationInfo.pivotIdx = nextToPivotIdx;
+                i--; // Do not advance index
+                iterationInfo.ongoingIdx = i + 1;
             }
 
-            Helper.sleep(sleepTime);
+            masterListener.notifyEndOfIteration();
         }
 
-        out.println("");
-        print(unsorted, pivotPosition, currentPosition);
+        masterListener.notifyEndOfPartition(iterationInfo);
 
-        Integer[] left = new Integer[pivotPosition]; // pivot is left out
-        Integer[] rigth = new Integer[unsorted.length - (pivotPosition + 1)];
+        Integer[] left = new Integer[iterationInfo.pivotIdx]; // pivot is left out
+        Integer[] rigth = new Integer[ongoing.length - (iterationInfo.pivotIdx + 1)];
 
-        for (int i = 0; i < pivotPosition; i++) {
-            left[i] = unsorted[i];
+        for (int i = 0; i < iterationInfo.pivotIdx; i++) {
+            left[i] = ongoing[i];
         }
 
-        int offset = pivotPosition + 1;
-        for (int i = 0; i < unsorted.length - offset; i++) {
-            rigth[i] = unsorted[i + offset];
+        int offset = iterationInfo.pivotIdx + 1;
+        for (int i = 0; i < ongoing.length - offset; i++) {
+            rigth[i] = ongoing[i + offset];
         }
 
-        return join(left.length > 0 ? partition(left) : left, pivot, rigth.length > 0 ? partition(rigth) : rigth);
+        // If no more items (length = 0) stop partitioning
+        return join(left.length > 0 ? partition(left) : left, pivotVal, rigth.length > 0 ? partition(rigth) : rigth);
     }
 
     private Integer[] join(Integer[] left, int pivot, Integer[] right) {
@@ -98,48 +109,23 @@ public class Quicksort {
             joined[i] = right[i - (left.length + 1)];
         }
 
+        out.println("Joined array:");
+        display.print(joined);
         return joined;
     }
 
-    private void swap(int x, int idxX, int y, int idxY, Integer[] unsorted) {
-        unsorted[idxX] = y;
-        unsorted[idxY] = x;
+    /** Swaps values E.g.
+    {n1, oingoingVal, n2,  nextToPivotVal, pivotVal, ...} -> {n1, nextToPivotVal, n2,  pivotVal, oingoingVal, ...}
+    */
+    private void swap(PartitionIterationInfo iterationInfo, int nextToPivot, int nextToPivotIdx) {
+        iterationInfo.ongoing[nextToPivotIdx] = iterationInfo.pivotVal;
+        iterationInfo.ongoing[iterationInfo.ongoingIdx] = nextToPivot;
+        iterationInfo.ongoing[iterationInfo.pivotIdx] = iterationInfo.ongoingVal;
     }
 
-    private static void print(Integer[] array, Integer pivotPosition, Integer ongoingIndex) {
-        out.println (
-                IntStream.range(0, array.length)
-                .mapToObj(i -> {
-                    String val = array[i].toString() ;
-                    val = i == pivotPosition ? "*" + val : val;
-                    val = i == ongoingIndex ? "_" + val : val;
-                    return rightPad(val, padding, ".");
-                }).collect(joining(""))
-        );
-
+    private void swap(PartitionIterationInfo iterationInfo) {
+        iterationInfo.ongoing[iterationInfo.ongoingIdx] = iterationInfo.pivotVal;
+        iterationInfo.ongoing[iterationInfo.pivotIdx] = iterationInfo.ongoingVal;
     }
 
-    private static void print(Integer[] array) {
-        out.println (
-                IntStream.range(0, array.length)
-                        .mapToObj(i -> {
-                            String val = array[i].toString() ;
-                            return rightPad(val, padding, ".");
-                        }).collect(joining(""))
-        );
-
-    }
-
-    static IntFunction<String> f = element -> rightPad(String.valueOf(element), padding);
-
-    static QuadFunction<Integer[], Integer, Integer, Integer, String> f2 = (array, i, pivotPosition, ongoingIndex) -> {
-        String val = array[i].toString() ;
-        val = i == pivotPosition ? "*" + val : val;
-        val = i == ongoingIndex ? "_" + val : val;
-        return rightPad(val, padding);
-    };
-
-    interface QuadFunction<T, U, V, W, R> {
-        R apply(T t, U u, V v, W w);
-    }
 }
