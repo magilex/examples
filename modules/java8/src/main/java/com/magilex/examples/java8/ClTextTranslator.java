@@ -24,10 +24,9 @@ public class ClTextTranslator {
 
         ClTextTranslator clTextTranslator = new ClTextTranslator(500, 3);
 
-        clTextTranslator.translateRight("abc", 0, 10);
+        clTextTranslator.translateRight("right", 0, 10);
         out.println("");
-        clTextTranslator.translateLeft("def", 10, 10);
-
+        clTextTranslator.translateLeft("left", 10, 10);
     }
 
     public void translateRight(String string, int initPos, int length) {
@@ -48,7 +47,9 @@ public class ClTextTranslator {
         IntStream.range(startRange, endRange)
                 .map(i -> map.apply(i).applyAsInt(startRange, endRange))
                 .forEach(i -> {
-                    if (i != initPos) out.print("\r");
+                    //if (i != initPos) out.print("\033[2K");
+                    if (i != initPos) out.print(String.format("\033[%dA", 1));
+                    //if (i != initPos) out.print("\r");
                     out.print(leftPad(string, (i * padding) + string.length(), Constants.PAD_CHAR));
                     sleep(tick);
                 });

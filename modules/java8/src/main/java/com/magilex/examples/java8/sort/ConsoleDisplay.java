@@ -42,8 +42,8 @@ public class ConsoleDisplay {
         sleep(tick);
     }
 
-    public void print(Integer[] array, Integer pivotPosition, Integer ongoingIndex) {
-        out.println (
+    public void print(Object[] array, Integer pivotPosition, Integer ongoingIndex) {
+        out.print (
                 IntStream.range(0, array.length)
                         .mapToObj(i -> {
                             String val = array[i].toString() ;
@@ -55,8 +55,8 @@ public class ConsoleDisplay {
         sleep(tick);
     }
 
-    public void print(Integer[] array) {
-        out.println (
+    public void print(Object[] array) {
+        out.print (
                 IntStream.range(0, array.length)
                         .mapToObj(i -> {
                             String val = array[i].toString() ;
@@ -65,14 +65,27 @@ public class ConsoleDisplay {
         );
     }
 
-    public void displaySwap(Integer [] arrInProgress, int pivotIdx, int currentIdx) {
+    public void displaySwap(String [] arrInProgress, int ongoingIdx, int pivotIdx, int pivotVal, int nextToPivotVal) {
         sleep(tick);
-        //out.print("\r");out.print("\r");
-        clTextTranslator.translateLeft(String.valueOf(arrInProgress[pivotIdx]), pivotIdx, 1);
+        print(arrInProgress, pivotIdx, ongoingIdx);
+
+        sleep(tick);
         out.print("\r");
-        clTextTranslator.translateLeft(String.valueOf(arrInProgress[pivotIdx - 1]), pivotIdx - 1, pivotIdx - currentIdx - 1);
+        arrInProgress[pivotIdx] = "_";
+        print(arrInProgress);
+        out.println("");
+        clTextTranslator.translateLeft(String.valueOf(pivotVal), pivotIdx, 1);
+        out.print("\r\r");
+        arrInProgress[pivotIdx - 1] = String.valueOf(pivotVal);
+        print(arrInProgress);
+
         out.print("\r");
-        clTextTranslator.translateRight(String.valueOf(arrInProgress[currentIdx]), currentIdx, pivotIdx - currentIdx);
+        clTextTranslator.translateLeft(String.valueOf(nextToPivotVal), pivotIdx - 1, pivotIdx - ongoingIdx - 1);
+        arrInProgress[ongoingIdx] = String.valueOf(nextToPivotVal);
+        print(arrInProgress);
+
+        out.print("\r");
+        clTextTranslator.translateRight(String.valueOf(arrInProgress[ongoingIdx]), ongoingIdx, pivotIdx - ongoingIdx);
     }
 
     public void pause() {
@@ -80,7 +93,7 @@ public class ConsoleDisplay {
     }
 
     public void printPivotVsOngoingComparationEval(int ongoing, int pivot, boolean ongoingVal_GreaterThan_PivotVal) {
-        out.print("\rOngoing element (" + ongoing + ") is greater than pivot (" + pivot + ")? ");
+        out.print("Ongoing element (" + ongoing + ") is greater than pivot (" + pivot + ")? ");
         sleep(tick);
         out.println(toStringYesNo(ongoingVal_GreaterThan_PivotVal));
         sleep(tick);

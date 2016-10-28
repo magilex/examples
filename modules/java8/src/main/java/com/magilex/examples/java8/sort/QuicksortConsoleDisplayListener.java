@@ -1,6 +1,7 @@
 package com.magilex.examples.java8.sort;
 
 import static com.magilex.examples.java8.Constants.*;
+import static java.lang.System.out;
 
 /**
  * Created by marcocamacho on 10/24/16.
@@ -16,13 +17,18 @@ public class QuicksortConsoleDisplayListener implements QuicksortListener {
 
     @Override
     public void notifyCycleStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal) {
-        display.printPivotVsOngoingComparationEval(iterationInfo.ongoingVal, iterationInfo.pivotVal, ongoingVal_GreaterThan_PivotVal);
+        out.print("\r");
         display.print(iterationInfo.ongoing, iterationInfo.pivotIdx, iterationInfo.ongoingIdx);
+        out.print(" ");
+        display.printPivotVsOngoingComparationEval(iterationInfo.ongoingVal, iterationInfo.pivotVal, ongoingVal_GreaterThan_PivotVal);
+        //display.print(iterationInfo.ongoing, iterationInfo.pivotIdx, iterationInfo.ongoingIdx);
+        //out.println("");
     }
 
     @Override
     public void notifySwapNeeded(Quicksort.PartitionIterationInfo iterationInfo, int i) {
-        display.displaySwap(iterationInfo.ongoing, iterationInfo.pivotIdx, iterationInfo.ongoingIdx);
+        display.displaySwap(iterationInfo.ongoingCopy2(),
+                iterationInfo.ongoingIdx, iterationInfo.pivotIdx, iterationInfo.pivotVal, iterationInfo.nextToPivotVal);
     }
 
     @Override
@@ -34,6 +40,7 @@ public class QuicksortConsoleDisplayListener implements QuicksortListener {
     public void notifyEndOfPartition(Quicksort.PartitionIterationInfo iterationInfo) {
         display.printPartitionFinished();
         display.print(iterationInfo.ongoing, iterationInfo.pivotIdx, iterationInfo.ongoingIdx);
+        out.println("");
     }
 
 

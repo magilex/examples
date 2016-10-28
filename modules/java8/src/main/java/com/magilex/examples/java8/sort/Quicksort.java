@@ -1,8 +1,11 @@
 package com.magilex.examples.java8.sort;
 
+import java.util.Arrays;
+
 import static com.magilex.examples.java8.Constants.padding;
 import static com.magilex.examples.java8.Constants.sleepTime;
 import static java.lang.System.out;
+import static java.util.Arrays.stream;
 
 /**
  * Created by marcocamacho on 9/29/16.
@@ -19,6 +22,7 @@ public class Quicksort {
         Quicksort quicksort = new Quicksort();
         quicksort.masterListener = QuicksortListener.QuicksortListenerFactory.create(new QuicksortConsoleDisplayListener());
 
+        int count = 1;
         quicksort.init(unsorted);
     }
 
@@ -31,12 +35,21 @@ public class Quicksort {
     public static class PartitionIterationInfo {
 
         Integer [] ongoing;
-        int pivotIdx, ongoingIdx, ongoingVal, pivotVal;
+        int pivotIdx, ongoingIdx, nextToPivotIdx, ongoingVal, pivotVal, nextToPivotVal;
 
         public PartitionIterationInfo(Integer[] ongoing, int pivotIdx, int pivotVal) {
             this.ongoing = ongoing;
             this.pivotIdx = pivotIdx;
             this.pivotVal = pivotVal;
+        }
+
+        public Integer[] ongoingCopy() {
+            return Arrays.copyOf(ongoing, ongoing.length);
+        }
+
+        public String[] ongoingCopy2() {
+            return stream(Arrays.copyOf(ongoing, ongoing.length))
+                    .map(String::valueOf).toArray(String[]::new);
         }
     }
 
@@ -60,17 +73,18 @@ public class Quicksort {
 
             if (ongoingVal_GreaterThan_PivotVal) {
 
+                iterationInfo.nextToPivotIdx = iterationInfo.pivotIdx - 1;
+                iterationInfo.nextToPivotVal = ongoing[iterationInfo.nextToPivotIdx];
+
                 masterListener.notifySwapNeeded(iterationInfo, i);
 
-                int nextToPivotIdx = iterationInfo.pivotIdx - 1;
-                int nextToPivot = ongoing[nextToPivotIdx];
-                if (iterationInfo.ongoingIdx == nextToPivotIdx) {
-                    swap(iterationInfo);
+                if (iterationInfo.ongoingIdx == iterationInfo.nextToPivotIdx) {
+                    swapDuo(iterationInfo);
                 } else {
-                    swap(iterationInfo, nextToPivot, nextToPivotIdx);
+                    swapTrio(iterationInfo);
                 }
 
-                iterationInfo.pivotIdx = nextToPivotIdx;
+                iterationInfo.pivotIdx = iterationInfo.nextToPivotIdx;
                 i--; // Do not advance index
                 iterationInfo.ongoingIdx = i + 1;
             }
@@ -114,16 +128,19 @@ public class Quicksort {
         return joined;
     }
 
-    /** Swaps values E.g.
-    {n1, oingoingVal, n2,  nextToPivotVal, pivotVal, ...} -> {n1, nextToPivotVal, n2,  pivotVal, oingoingVal, ...}
+    /** Swaps ongoingVal, nextToPivotVal and pivotVal such that:
+    {n1, ongoingVal, n2,  nextToPivotVal, pivotVal, ...} -> {n1, nextToPivotVal, n2,  pivotVal, ongoingVal, ...}
     */
-    private void swap(PartitionIterationInfo iterationInfo, int nextToPivot, int nextToPivotIdx) {
-        iterationInfo.ongoing[nextToPivotIdx] = iterationInfo.pivotVal;
-        iterationInfo.ongoing[iterationInfo.ongoingIdx] = nextToPivot;
+    private void swapTrio(PartitionIterationInfo iterationInfo) {
+        iterationInfo.ongoing[iterationInfo.nextToPivotIdx] = iterationInfo.pivotVal;
+        iterationInfo.ongoing[iterationInfo.ongoingIdx] = iterationInfo.nextToPivotVal;
         iterationInfo.ongoing[iterationInfo.pivotIdx] = iterationInfo.ongoingVal;
     }
 
-    private void swap(PartitionIterationInfo iterationInfo) {
+    /** Swaps ongoingVal and pivotVal such that:
+     {n1, ongoingVal, pivotVal, ...} -> {n1, pivotVal, ongoingVal, ...}
+     */
+    private void swapDuo(PartitionIterationInfo iterationInfo) {
         iterationInfo.ongoing[iterationInfo.ongoingIdx] = iterationInfo.pivotVal;
         iterationInfo.ongoing[iterationInfo.pivotIdx] = iterationInfo.ongoingVal;
     }
