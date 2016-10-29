@@ -11,7 +11,7 @@ public interface QuicksortListener {
 
     void notifyPartitionStarted();
 
-    void notifyCycleStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal);
+    void notifyIteratioinStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal);
 
     void notifySwapNeeded(Quicksort.PartitionIterationInfo iterationInfo, int i);
 
@@ -34,8 +34,8 @@ public interface QuicksortListener {
                 }
 
                 @Override
-                public void notifyCycleStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal) {
-                    listeners.forEach(listener -> listener.notifyCycleStarted(iterationInfo, ongoingVal_GreaterThan_PivotVal));
+                public void notifyIteratioinStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal) {
+                    listeners.forEach(listener -> listener.notifyIteratioinStarted(iterationInfo, ongoingVal_GreaterThan_PivotVal));
                 }
 
                 @Override

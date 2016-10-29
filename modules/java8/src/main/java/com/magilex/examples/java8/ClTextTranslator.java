@@ -22,11 +22,11 @@ public class ClTextTranslator {
 
     public static void main(String[] args) {
 
-        ClTextTranslator clTextTranslator = new ClTextTranslator(500, 3);
+        ClTextTranslator clTextTranslator = new ClTextTranslator(900, 3);
 
-        clTextTranslator.translateRight("right", 0, 10);
+        clTextTranslator.translateRight("rt", 0, 10);
         out.println("");
-        clTextTranslator.translateLeft("left", 10, 10);
+        clTextTranslator.translateLeft("lf", 10, 10);
     }
 
     public void translateRight(String string, int initPos, int length) {
@@ -47,13 +47,13 @@ public class ClTextTranslator {
         IntStream.range(startRange, endRange)
                 .map(i -> map.apply(i).applyAsInt(startRange, endRange))
                 .forEach(i -> {
-                    //if (i != initPos) out.print("\033[2K");
-                    if (i != initPos) out.print(String.format("\033[%dA", 1));
-                    //if (i != initPos) out.print("\r");
+                    if (i != initPos) ConsoleHelper.removeLine();
+
                     out.print(leftPad(string, (i * padding) + string.length(), Constants.PAD_CHAR));
                     sleep(tick);
                 });
     }
+
 
     static IntFunction<IntBinaryOperator> emit = i -> (startR, endR) -> i;
 

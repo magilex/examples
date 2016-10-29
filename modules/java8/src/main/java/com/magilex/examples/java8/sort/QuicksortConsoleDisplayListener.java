@@ -1,5 +1,7 @@
 package com.magilex.examples.java8.sort;
 
+import com.magilex.examples.java8.ConsoleHelper;
+
 import static com.magilex.examples.java8.Constants.*;
 import static java.lang.System.out;
 
@@ -16,19 +18,18 @@ public class QuicksortConsoleDisplayListener implements QuicksortListener {
     }
 
     @Override
-    public void notifyCycleStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal) {
-        out.print("\r");
+    public void notifyIteratioinStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal) {
+        ConsoleHelper.removeLine();
         display.print(iterationInfo.ongoing, iterationInfo.pivotIdx, iterationInfo.ongoingIdx);
-        out.print(" ");
         display.printPivotVsOngoingComparationEval(iterationInfo.ongoingVal, iterationInfo.pivotVal, ongoingVal_GreaterThan_PivotVal);
-        //display.print(iterationInfo.ongoing, iterationInfo.pivotIdx, iterationInfo.ongoingIdx);
-        //out.println("");
     }
 
     @Override
     public void notifySwapNeeded(Quicksort.PartitionIterationInfo iterationInfo, int i) {
         display.displaySwap(iterationInfo.ongoingCopy2(),
-                iterationInfo.ongoingIdx, iterationInfo.pivotIdx, iterationInfo.pivotVal, iterationInfo.nextToPivotVal);
+                iterationInfo.pivotIdx, String.valueOf(iterationInfo.pivotVal),
+                iterationInfo.nextToPivotIdx, String.valueOf(iterationInfo.nextToPivotVal),
+                iterationInfo.ongoingIdx, String.valueOf(iterationInfo.ongoingVal));
     }
 
     @Override

@@ -1,0 +1,12 @@
+.cache
+lib
+.classpath
+.project
+jboss_birt.zip
+*.jar
+*.idea
+*.iml
+*~
+.settings
+build/
+out

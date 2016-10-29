@@ -43,10 +43,6 @@ public class Quicksort {
             this.pivotVal = pivotVal;
         }
 
-        public Integer[] ongoingCopy() {
-            return Arrays.copyOf(ongoing, ongoing.length);
-        }
-
         public String[] ongoingCopy2() {
             return stream(Arrays.copyOf(ongoing, ongoing.length))
                     .map(String::valueOf).toArray(String[]::new);
@@ -69,7 +65,7 @@ public class Quicksort {
 
             boolean ongoingVal_GreaterThan_PivotVal = iterationInfo.ongoingVal > pivotVal;
 
-            masterListener.notifyCycleStarted(iterationInfo, ongoingVal_GreaterThan_PivotVal);
+            masterListener.notifyIteratioinStarted(iterationInfo, ongoingVal_GreaterThan_PivotVal);
 
             if (ongoingVal_GreaterThan_PivotVal) {
 
@@ -123,8 +119,10 @@ public class Quicksort {
             joined[i] = right[i - (left.length + 1)];
         }
 
-        out.println("Joined array:");
+        out.print("Joined array: ");
         display.print(joined);
+        out.println();
+
         return joined;
     }
 

@@ -1,6 +1,7 @@
 package com.magilex.examples.java8.sort;
 
 import com.magilex.examples.java8.ClTextTranslator;
+import com.magilex.examples.java8.ConsoleHelper;
 import com.magilex.examples.java8.Constants;
 
 import java.util.stream.IntStream;
@@ -31,24 +32,44 @@ public class ConsoleDisplay {
     }
 
     public void printPartitionStarted() {
-        out.println("------------------------------------------------------------");
+        out.println("------------------------------------------------------------------------------------");
         out.println("Partitioning...");
         sleep(tick);
     }
 
     public void printPartitionFinished() {
-        out.print("\r");
+        ConsoleHelper.removeLine();
         out.println("Partitioning completed");
         sleep(tick);
     }
 
-    public void print(Object[] array, Integer pivotPosition, Integer ongoingIndex) {
+    public void print(Object[] array, Integer pivotIdx, Integer ongoingIndex) {
+        print(array, pivotIdx, ongoingIndex, "*", ".");
+    }
+
+    public void print(Object[] array, Integer pivotIdx, Integer ongoingIdx, Integer nextToPivotIdx,
+                      String pivotDecor, String ongoingDecor, String nextToPivotDecor) {
         out.print (
                 IntStream.range(0, array.length)
                         .mapToObj(i -> {
                             String val = array[i].toString() ;
-                            val = i == pivotPosition ? "*" + val : val;
-                            val = i == ongoingIndex ? "_" + val : val;
+                            val = i == pivotIdx ? pivotDecor + val : val;
+                            val = i == nextToPivotIdx ? nextToPivotDecor + val : val;
+                            if (nextToPivotIdx != ongoingIdx)
+                                val = i == ongoingIdx ? ongoingDecor + val : val;
+                            return rightPad(val, padding, Constants.PAD_CHAR);
+                        }).collect(joining(""))
+        );
+        //sleep(tick);
+    }
+
+    public void print(Object[] array, Integer pivotIdx, Integer ongoingIdx, String pivotDecor, String ongoingDecor) {
+        out.print (
+                IntStream.range(0, array.length)
+                        .mapToObj(i -> {
+                            String val = array[i].toString() ;
+                            val = i == pivotIdx ? pivotDecor + val : val;
+                            val = i == ongoingIdx ? ongoingDecor + val : val;
                             return rightPad(val, padding, Constants.PAD_CHAR);
                         }).collect(joining(""))
         );
@@ -65,27 +86,49 @@ public class ConsoleDisplay {
         );
     }
 
-    public void displaySwap(String [] arrInProgress, int ongoingIdx, int pivotIdx, int pivotVal, int nextToPivotVal) {
+    public void displaySwap(String [] arrInProgress,
+                            int pivotIdx, String pivotVal,
+                            int nextToPivotIdx, String nextToPivotVal,
+                            int ongoingIdx, String ongoingVal) {
         sleep(tick);
-        print(arrInProgress, pivotIdx, ongoingIdx);
+        print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "*", ".", ".");
+        out.println();
+        out.print(" ");
 
         sleep(tick);
-        out.print("\r");
-        arrInProgress[pivotIdx] = "_";
-        print(arrInProgress);
+        ConsoleHelper.removeLine();
+        ConsoleHelper.moveCursorUp();
+        ConsoleHelper.removeLine();
+        arrInProgress[pivotIdx] = "";
+        print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "_", ".", ".");
         out.println("");
-        clTextTranslator.translateLeft(String.valueOf(pivotVal), pivotIdx, 1);
-        out.print("\r\r");
-        arrInProgress[pivotIdx - 1] = String.valueOf(pivotVal);
-        print(arrInProgress);
 
-        out.print("\r");
-        clTextTranslator.translateLeft(String.valueOf(nextToPivotVal), pivotIdx - 1, pivotIdx - ongoingIdx - 1);
-        arrInProgress[ongoingIdx] = String.valueOf(nextToPivotVal);
-        print(arrInProgress);
+        clTextTranslator.translateLeft("*" + pivotVal, pivotIdx, 1);
+        ConsoleHelper.removeLine();
+        ConsoleHelper.moveCursorUp();
+        ConsoleHelper.removeLine();
+        arrInProgress[pivotIdx - 1] = pivotVal;
+        print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "_", ".", "*");
+        out.println("");
 
-        out.print("\r");
-        clTextTranslator.translateRight(String.valueOf(arrInProgress[ongoingIdx]), ongoingIdx, pivotIdx - ongoingIdx);
+        if (ongoingIdx != nextToPivotIdx) {
+            clTextTranslator.translateLeft(nextToPivotVal, nextToPivotIdx, pivotIdx - ongoingIdx - 1);
+            ConsoleHelper.removeLine();
+            ConsoleHelper.moveCursorUp();
+            ConsoleHelper.removeLine();
+            arrInProgress[ongoingIdx] = nextToPivotVal;
+            print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "_", ".", "*");
+            out.println("");
+        }
+
+        clTextTranslator.translateRight(ongoingVal, ongoingIdx, pivotIdx - ongoingIdx);
+        ConsoleHelper.removeLine();
+        ConsoleHelper.moveCursorUp();
+        ConsoleHelper.removeLine();
+        arrInProgress[pivotIdx] = ongoingVal;
+
+        print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, ".", ".", "*");
+
     }
 
     public void pause() {
