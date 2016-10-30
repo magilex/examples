@@ -1,4 +1,4 @@
-package com.magilex.examples.algorithms.quicksort;
+package com.magilex.examples.algorithms.sorting.quicksort;
 
 /**
  * Created by marcocamacho on 10/24/16.

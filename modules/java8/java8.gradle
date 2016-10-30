@@ -1,9 +1,1 @@
 apply plugin: 'java'
-apply plugin: 'application'
-
-dependencies {
-    compile 'org.apache.commons:commons-lang3:3.4'
-}
-
-mainClassName = 'com.magilex.examples.java8.sort.Quicksort'
-//mainClassName = 'com.magilex.examples.java8.CmdLineTextTranslator'

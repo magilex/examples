@@ -1,4 +1,4 @@
-package com.magilex.examples.algorithms.quicksort;
+package com.magilex.examples.algorithms.sorting.quicksort;
 
 import com.magilex.examples.ui.console.CmdLineTextTranslator;
 import com.magilex.examples.ui.console.ConsoleHelper;

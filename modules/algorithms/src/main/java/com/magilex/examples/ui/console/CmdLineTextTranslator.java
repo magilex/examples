@@ -1,6 +1,6 @@
 package com.magilex.examples.ui.console;
 
-import com.magilex.examples.algorithms.quicksort.Constants;
+import com.magilex.examples.algorithms.sorting.quicksort.Constants;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.*;
