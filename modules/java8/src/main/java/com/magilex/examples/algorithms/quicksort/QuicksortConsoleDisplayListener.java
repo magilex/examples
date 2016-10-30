@@ -1,8 +1,7 @@
-package com.magilex.examples.java8.sort;
+package com.magilex.examples.algorithms.quicksort;
 
-import com.magilex.examples.java8.ConsoleHelper;
+import com.magilex.examples.ui.console.ConsoleHelper;
 
-import static com.magilex.examples.java8.Constants.*;
 import static java.lang.System.out;
 
 /**
@@ -10,7 +9,7 @@ import static java.lang.System.out;
  */
 public class QuicksortConsoleDisplayListener implements QuicksortListener {
 
-    private static ConsoleDisplay display = ConsoleDisplay.newInstance(padding, sleepTime);
+    private static ConsoleDisplay display = ConsoleDisplay.newInstance(Constants.padding, Constants.sleepTime);
 
     @Override
     public void notifyPartitionStarted(int pivotVal) {

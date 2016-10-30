@@ -1,4 +1,4 @@
-package com.magilex.examples.java8;
+package com.magilex.examples.algorithms.quicksort;
 
 /**
  * Created by marcocamacho on 10/24/16.

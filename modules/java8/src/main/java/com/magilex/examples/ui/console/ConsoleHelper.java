@@ -1,4 +1,4 @@
-package com.magilex.examples.java8;
+package com.magilex.examples.ui.console;
 
 import static java.lang.System.out;
 

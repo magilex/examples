@@ -1,12 +1,11 @@
-package com.magilex.examples.java8.sort;
+package com.magilex.examples.algorithms.quicksort;
 
-import com.magilex.examples.java8.ClTextTranslator;
-import com.magilex.examples.java8.ConsoleHelper;
-import com.magilex.examples.java8.Constants;
+import com.magilex.examples.ui.console.CmdLineTextTranslator;
+import com.magilex.examples.ui.console.ConsoleHelper;
 
 import java.util.stream.IntStream;
 
-import static com.magilex.examples.java8.sort.Helper.sleep;
+import static com.magilex.examples.Helper.sleep;
 import static java.lang.System.out;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.BooleanUtils.toStringYesNo;
@@ -23,12 +22,12 @@ public class ConsoleDisplay {
 
     private int padding;
     private int tick;
-    private ClTextTranslator clTextTranslator;
+    private CmdLineTextTranslator textTranslator;
 
     private ConsoleDisplay(int padding, int tick) {
         this.padding = padding;
         this.tick = tick;
-        this.clTextTranslator = new ClTextTranslator(tick, padding);
+        this.textTranslator = new CmdLineTextTranslator(tick, padding);
     }
 
     public void printPartitionStarted(int pivotVal) {
@@ -44,7 +43,7 @@ public class ConsoleDisplay {
     }
 
     public void print(Object[] array, Integer pivotIdx, Integer ongoingIndex) {
-        print(array, pivotIdx, ongoingIndex, "*", ".");
+        print(array, pivotIdx, ongoingIndex, "*", "");
     }
 
     public void print(Object[] array, Integer pivotIdx, Integer ongoingIdx, Integer nextToPivotIdx,
@@ -89,7 +88,7 @@ public class ConsoleDisplay {
                             int pivotIdx, String pivotVal,
                             int nextToPivotIdx, String nextToPivotVal,
                             int ongoingIdx, String ongoingVal) {
-        print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "*", ".", ".");
+        print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "*", "", ".");
         out.println();
 
         sleep(tick);
@@ -97,34 +96,34 @@ public class ConsoleDisplay {
         ConsoleHelper.moveCursorUp();
         ConsoleHelper.removeLine();
         arrInProgress[pivotIdx] = "";
-        print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "_", ".", ".");
+        print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "_", "", ".");
         out.println("");
 
-        clTextTranslator.translateLeft("*" + pivotVal, pivotIdx, 1);
+        textTranslator.translateLeft("*" + pivotVal, pivotIdx, 1);
         ConsoleHelper.removeLine();
         ConsoleHelper.moveCursorUp();
         ConsoleHelper.removeLine();
         arrInProgress[pivotIdx - 1] = pivotVal;
-        print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "_", ".", "*");
+        print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "_", "", "*");
         out.println("");
 
         if (ongoingIdx != nextToPivotIdx) {
-            clTextTranslator.translateLeft(nextToPivotVal, nextToPivotIdx, pivotIdx - ongoingIdx - 1);
+            textTranslator.translateLeft(nextToPivotVal, nextToPivotIdx, pivotIdx - ongoingIdx - 1);
             ConsoleHelper.removeLine();
             ConsoleHelper.moveCursorUp();
             ConsoleHelper.removeLine();
             arrInProgress[ongoingIdx] = nextToPivotVal;
-            print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "_", ".", "*");
+            print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "_", "", "*");
             out.println("");
         }
 
-        clTextTranslator.translateRight(ongoingVal, ongoingIdx, pivotIdx - ongoingIdx);
+        textTranslator.translateRight(ongoingVal, ongoingIdx, pivotIdx - ongoingIdx);
         ConsoleHelper.removeLine();
         ConsoleHelper.moveCursorUp();
         ConsoleHelper.removeLine();
         arrInProgress[pivotIdx] = ongoingVal;
 
-        print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, ".", ".", "*");
+        print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "", ".", "*");
 
     }
 

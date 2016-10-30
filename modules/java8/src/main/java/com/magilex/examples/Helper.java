@@ -1,4 +1,4 @@
-package com.magilex.examples.java8.sort;
+package com.magilex.examples;
 
 /**
  * Created by mcamacho on 9/30/16.

@@ -6,4 +6,4 @@ dependencies {
 }
 
 mainClassName = 'com.magilex.examples.java8.sort.Quicksort'
-//mainClassName = 'com.magilex.examples.java8.ClTextTranslator'
+//mainClassName = 'com.magilex.examples.java8.CmdLineTextTranslator'

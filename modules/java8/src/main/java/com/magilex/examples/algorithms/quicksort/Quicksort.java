@@ -1,4 +1,4 @@
-package com.magilex.examples.java8.sort;
+package com.magilex.examples.algorithms.quicksort;
 
 import org.apache.commons.lang3.ArrayUtils;
 

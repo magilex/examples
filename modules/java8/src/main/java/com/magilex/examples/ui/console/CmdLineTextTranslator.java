@@ -1,32 +1,34 @@
-package com.magilex.examples.java8;
+package com.magilex.examples.ui.console;
+
+import com.magilex.examples.algorithms.quicksort.Constants;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.*;
 import java.util.stream.IntStream;
 
-import static com.magilex.examples.java8.sort.Helper.sleep;
+import static com.magilex.examples.Helper.sleep;
 import static java.lang.System.out;
-import static org.apache.commons.lang3.StringUtils.leftPad;
 
 /**
  * Created by marcocamacho on 10/2/16.
  */
-public class ClTextTranslator {
+public class CmdLineTextTranslator {
 
     private int tick;
     private int padding;
 
-    public ClTextTranslator(int tick, int padding) {
+    public CmdLineTextTranslator(int tick, int padding) {
         this.tick = tick;
         this.padding = padding;
     }
 
     public static void main(String[] args) {
 
-        ClTextTranslator clTextTranslator = new ClTextTranslator(900, 3);
+        CmdLineTextTranslator textTranslator = new CmdLineTextTranslator(900, 3);
 
-        clTextTranslator.translateRight("rt", 0, 10);
+        textTranslator.translateRight("rt", 0, 10);
         out.println("");
-        clTextTranslator.translateLeft("lf", 10, 10);
+        textTranslator.translateLeft("lf", 10, 10);
     }
 
     public void translateRight(String string, int initPos, int length) {
@@ -49,7 +51,7 @@ public class ClTextTranslator {
                 .forEach(i -> {
                     if (i != initPos) ConsoleHelper.removeLine();
 
-                    out.print(leftPad(string, (i * padding) + string.length(), Constants.PAD_CHAR));
+                    out.print(StringUtils.leftPad(string, (i * padding) + string.length(), Constants.PAD_CHAR));
                     sleep(tick);
                 });
     }
