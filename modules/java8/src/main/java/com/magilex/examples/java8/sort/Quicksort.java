@@ -1,9 +1,9 @@
 package com.magilex.examples.java8.sort;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Arrays;
 
-import static com.magilex.examples.java8.Constants.padding;
-import static com.magilex.examples.java8.Constants.sleepTime;
 import static java.lang.System.out;
 import static java.util.Arrays.stream;
 
@@ -12,27 +12,21 @@ import static java.util.Arrays.stream;
  */
 public class Quicksort {
 
-    static ConsoleDisplay display = ConsoleDisplay.newInstance(padding, sleepTime);
-
     public static void main(String[] args) {
-        out.println("Tony Hoare's 1959 quicksort algorithm");
+        out.println("A variation of Tony Hoare's 1959 quicksort algorithm");
+        out.print("Main goal is to display the basis of how algorithm works ");
+        out.print("and for the code readers to be able to understand it with least effort possible.");
+        out.println();
 
-        Integer[] unsorted = new Integer[] {4,6,1,9,10,3,30,5};
+        Integer[] unsorted = new Integer[] {4,6,1,9,10,5,3,30,5};
 
         Quicksort quicksort = new Quicksort();
         quicksort.masterListener = QuicksortListener.QuicksortListenerFactory.create(new QuicksortConsoleDisplayListener());
 
-        int count = 1;
         quicksort.init(unsorted);
     }
 
-    QuicksortListener masterListener;
-
-    public Integer[] init(Integer[] unsorted) {
-        return partition(unsorted);
-    }
-
-    public static class PartitionIterationInfo {
+    static class PartitionIterationInfo {
 
         Integer [] ongoing;
         int pivotIdx, ongoingIdx, nextToPivotIdx, ongoingVal, pivotVal, nextToPivotVal;
@@ -43,18 +37,28 @@ public class Quicksort {
             this.pivotVal = pivotVal;
         }
 
-        public String[] ongoingCopy2() {
+        public String[] ongoingCopy() {
             return stream(Arrays.copyOf(ongoing, ongoing.length))
                     .map(String::valueOf).toArray(String[]::new);
         }
+
+        public boolean isOngoingAndNextToPivotSame() {
+            return ongoingIdx == nextToPivotIdx;
+        }
+    }
+
+    QuicksortListener masterListener;
+
+    public Integer[] init(Integer[] unsorted) {
+        return partition(unsorted);
     }
 
     private Integer[] partition(Integer [] ongoing) {
 
-        masterListener.notifyPartitionStarted();
-
         int lastIdx = ongoing.length - 1;
         int pivotVal = ongoing[lastIdx]; // Rightmost element
+
+        masterListener.notifyPartitionStarted(pivotVal);
 
         PartitionIterationInfo iterationInfo = new PartitionIterationInfo(ongoing, lastIdx, pivotVal);
 
@@ -65,16 +69,16 @@ public class Quicksort {
 
             boolean ongoingVal_GreaterThan_PivotVal = iterationInfo.ongoingVal > pivotVal;
 
-            masterListener.notifyIteratioinStarted(iterationInfo, ongoingVal_GreaterThan_PivotVal);
+            masterListener.notifyIterationStarted(iterationInfo, ongoingVal_GreaterThan_PivotVal);
 
             if (ongoingVal_GreaterThan_PivotVal) {
 
                 iterationInfo.nextToPivotIdx = iterationInfo.pivotIdx - 1;
                 iterationInfo.nextToPivotVal = ongoing[iterationInfo.nextToPivotIdx];
 
-                masterListener.notifySwapNeeded(iterationInfo, i);
+                masterListener.notifySwapNeeded(iterationInfo, iterationInfo.ongoingIdx);
 
-                if (iterationInfo.ongoingIdx == iterationInfo.nextToPivotIdx) {
+                if (iterationInfo.isOngoingAndNextToPivotSame()) {
                     swapDuo(iterationInfo);
                 } else {
                     swapTrio(iterationInfo);
@@ -82,48 +86,30 @@ public class Quicksort {
 
                 iterationInfo.pivotIdx = iterationInfo.nextToPivotIdx;
                 i--; // Do not advance index
-                iterationInfo.ongoingIdx = i + 1;
+                iterationInfo.ongoingIdx = i + 1; // Do advance ongoing index
             }
 
             masterListener.notifyEndOfIteration();
         }
 
-        masterListener.notifyEndOfPartition(iterationInfo);
+        masterListener.notifyIterationCycleEnded(iterationInfo);
 
-        Integer[] left = new Integer[iterationInfo.pivotIdx]; // pivot is left out
-        Integer[] rigth = new Integer[ongoing.length - (iterationInfo.pivotIdx + 1)];
+        Integer[] left = Arrays.copyOf(ongoing, iterationInfo.pivotIdx); // pivot is left out
+        Integer[] right = Arrays.copyOfRange(ongoing, iterationInfo.pivotIdx + 1, ongoing.length);
 
-        for (int i = 0; i < iterationInfo.pivotIdx; i++) {
-            left[i] = ongoing[i];
-        }
+        // If more than one item, partition, if only one item (length = 1) stop partitioning
+        Integer[] joined = join(left.length > 1 ? partition(left) : left, pivotVal, right.length > 1 ? partition(right) : right);
 
-        int offset = iterationInfo.pivotIdx + 1;
-        for (int i = 0; i < ongoing.length - offset; i++) {
-            rigth[i] = ongoing[i + offset];
-        }
-
-        // If no more items (length = 0) stop partitioning
-        return join(left.length > 0 ? partition(left) : left, pivotVal, rigth.length > 0 ? partition(rigth) : rigth);
-    }
-
-    private Integer[] join(Integer[] left, int pivot, Integer[] right) {
-        Integer[] joined = new Integer[left.length + right.length + 1]; // + 1 is pivot
-
-        for (int i = 0; i < left.length; i++) {
-            joined[i] = left[i];
-        }
-
-        joined[left.length] = pivot;
-
-        for (int i = left.length + 1; i < joined.length; i++) {
-            joined[i] = right[i - (left.length + 1)];
-        }
-
-        out.print("Joined array: ");
-        display.print(joined);
-        out.println();
+        masterListener.notifyPartitionEnded(joined);
 
         return joined;
+    }
+
+    /** Joins left array, pivot element and right array
+     */
+    private Integer[] join(Integer[] left, int pivot, Integer[] right) {
+        Integer[] leftPlusPivot = ArrayUtils.add(left, pivot);
+        return ArrayUtils.addAll(leftPlusPivot, right);
     }
 
     /** Swaps ongoingVal, nextToPivotVal and pivotVal such that:

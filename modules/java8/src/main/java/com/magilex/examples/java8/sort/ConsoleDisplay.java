@@ -31,9 +31,9 @@ public class ConsoleDisplay {
         this.clTextTranslator = new ClTextTranslator(tick, padding);
     }
 
-    public void printPartitionStarted() {
-        out.println("------------------------------------------------------------------------------------");
-        out.println("Partitioning...");
+    public void printPartitionStarted(int pivotVal) {
+        out.println("--------------------------------------------------------------------------------------------------");
+        out.println("Partitioning with pivot *" + pivotVal);
         sleep(tick);
     }
 
@@ -60,7 +60,6 @@ public class ConsoleDisplay {
                             return rightPad(val, padding, Constants.PAD_CHAR);
                         }).collect(joining(""))
         );
-        //sleep(tick);
     }
 
     public void print(Object[] array, Integer pivotIdx, Integer ongoingIdx, String pivotDecor, String ongoingDecor) {
@@ -90,10 +89,8 @@ public class ConsoleDisplay {
                             int pivotIdx, String pivotVal,
                             int nextToPivotIdx, String nextToPivotVal,
                             int ongoingIdx, String ongoingVal) {
-        sleep(tick);
         print(arrInProgress, pivotIdx, ongoingIdx, nextToPivotIdx, "*", ".", ".");
         out.println();
-        out.print(" ");
 
         sleep(tick);
         ConsoleHelper.removeLine();
@@ -135,11 +132,21 @@ public class ConsoleDisplay {
         sleep(tick);
     }
 
-    public void printPivotVsOngoingComparationEval(int ongoing, int pivot, boolean ongoingVal_GreaterThan_PivotVal) {
+    public void printPivotVsOngoingComparation(int ongoing, int pivot, boolean ongoingVal_GreaterThan_PivotVal) {
         out.print("Ongoing element (" + ongoing + ") is greater than pivot (" + pivot + ")? ");
         sleep(tick);
-        out.println(toStringYesNo(ongoingVal_GreaterThan_PivotVal));
+        out.print(toStringYesNo(ongoingVal_GreaterThan_PivotVal));
+        sleep(tick);
+        if (ongoingVal_GreaterThan_PivotVal)
+            out.print(", then swap");
+        out.println();
         sleep(tick);
     }
 
+    public void printJoinedArray(Integer[] joined) {
+        out.print("Joined array: ");
+        print(joined);
+        out.println();
+        sleep(tick);
+    }
 }

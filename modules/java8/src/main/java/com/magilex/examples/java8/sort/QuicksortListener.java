@@ -9,15 +9,17 @@ import static java.util.Arrays.asList;
  */
 public interface QuicksortListener {
 
-    void notifyPartitionStarted();
+    void notifyPartitionStarted(int pivotVal);
 
-    void notifyIteratioinStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal);
+    void notifyIterationStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal);
 
     void notifySwapNeeded(Quicksort.PartitionIterationInfo iterationInfo, int i);
 
     void notifyEndOfIteration();
 
-    void notifyEndOfPartition(Quicksort.PartitionIterationInfo iterationInfo);
+    void notifyIterationCycleEnded(Quicksort.PartitionIterationInfo iterationInfo);
+
+    void notifyPartitionEnded(Integer[] joined);
 
     class QuicksortListenerFactory {
 
@@ -29,13 +31,13 @@ public interface QuicksortListener {
                 private List<QuicksortListener> listeners = asList(listenerParams);
 
                 @Override
-                public void notifyPartitionStarted() {
-                    listeners.forEach(QuicksortListener::notifyPartitionStarted);
+                public void notifyPartitionStarted(int pivotVal) {
+                    listeners.forEach(listener -> listener.notifyPartitionStarted(pivotVal));
                 }
 
                 @Override
-                public void notifyIteratioinStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal) {
-                    listeners.forEach(listener -> listener.notifyIteratioinStarted(iterationInfo, ongoingVal_GreaterThan_PivotVal));
+                public void notifyIterationStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal) {
+                    listeners.forEach(listener -> listener.notifyIterationStarted(iterationInfo, ongoingVal_GreaterThan_PivotVal));
                 }
 
                 @Override
@@ -45,14 +47,18 @@ public interface QuicksortListener {
 
                 @Override
                 public void notifyEndOfIteration() {
-                    listeners.forEach(listener -> listener.notifyEndOfIteration());
+                    listeners.forEach(QuicksortListener::notifyEndOfIteration);
                 }
 
                 @Override
-                public void notifyEndOfPartition(Quicksort.PartitionIterationInfo iterationInfo) {
-                    listeners.forEach(listener ->  listener.notifyEndOfPartition(iterationInfo));
+                public void notifyIterationCycleEnded(Quicksort.PartitionIterationInfo iterationInfo) {
+                    listeners.forEach(listener ->  listener.notifyIterationCycleEnded(iterationInfo));
                 }
 
+                @Override
+                public void notifyPartitionEnded(Integer[] joined) {
+                    listeners.forEach(listener ->  listener.notifyPartitionEnded(joined));
+                }
             };
         }
 

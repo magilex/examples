@@ -6,6 +6,7 @@ jboss_birt.zip
 *.jar
 *.idea
 *.iml
+*.class
 *~
 .settings
 build/

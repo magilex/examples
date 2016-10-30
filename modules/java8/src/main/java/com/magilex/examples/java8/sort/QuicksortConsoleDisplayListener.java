@@ -10,23 +10,23 @@ import static java.lang.System.out;
  */
 public class QuicksortConsoleDisplayListener implements QuicksortListener {
 
-    static ConsoleDisplay display = ConsoleDisplay.newInstance(padding, sleepTime);
+    private static ConsoleDisplay display = ConsoleDisplay.newInstance(padding, sleepTime);
 
     @Override
-    public void notifyPartitionStarted() {
-        display.printPartitionStarted();
+    public void notifyPartitionStarted(int pivotVal) {
+        display.printPartitionStarted(pivotVal);
     }
 
     @Override
-    public void notifyIteratioinStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal) {
+    public void notifyIterationStarted(Quicksort.PartitionIterationInfo iterationInfo, boolean ongoingVal_GreaterThan_PivotVal) {
         ConsoleHelper.removeLine();
         display.print(iterationInfo.ongoing, iterationInfo.pivotIdx, iterationInfo.ongoingIdx);
-        display.printPivotVsOngoingComparationEval(iterationInfo.ongoingVal, iterationInfo.pivotVal, ongoingVal_GreaterThan_PivotVal);
+        display.printPivotVsOngoingComparation(iterationInfo.ongoingVal, iterationInfo.pivotVal, ongoingVal_GreaterThan_PivotVal);
     }
 
     @Override
     public void notifySwapNeeded(Quicksort.PartitionIterationInfo iterationInfo, int i) {
-        display.displaySwap(iterationInfo.ongoingCopy2(),
+        display.displaySwap(iterationInfo.ongoingCopy(),
                 iterationInfo.pivotIdx, String.valueOf(iterationInfo.pivotVal),
                 iterationInfo.nextToPivotIdx, String.valueOf(iterationInfo.nextToPivotVal),
                 iterationInfo.ongoingIdx, String.valueOf(iterationInfo.ongoingVal));
@@ -38,11 +38,15 @@ public class QuicksortConsoleDisplayListener implements QuicksortListener {
     }
 
     @Override
-    public void notifyEndOfPartition(Quicksort.PartitionIterationInfo iterationInfo) {
+    public void notifyIterationCycleEnded(Quicksort.PartitionIterationInfo iterationInfo) {
         display.printPartitionFinished();
-        display.print(iterationInfo.ongoing, iterationInfo.pivotIdx, iterationInfo.ongoingIdx);
-        out.println("");
+        display.print(iterationInfo.ongoing, iterationInfo.pivotIdx, -1);
+        out.println();
     }
 
+    @Override
+    public void notifyPartitionEnded(Integer[] joined) {
+        display.printJoinedArray(joined);
+    }
 
 }
