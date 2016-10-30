@@ -7,5 +7,5 @@ public class Constants {
 
     public static char PAD_CHAR = ' ';
     public static int padding = 5;
-    public static int sleepTime = 199;
+    public static int sleepTime = 599;
 }
