@@ -9,5 +9,5 @@ jboss_birt.zip
 *.class
 *~
 .settings
-build/
+**/build/
 out
